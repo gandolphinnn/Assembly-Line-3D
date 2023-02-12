@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -37,9 +36,7 @@ public class PlayerActions : MonoBehaviour {
 
 	void Start() {
 		bSys = blockManager.GetComponent<BlockSystem>();
-		bSys.Init();
-		bSys.Place(1,0,0,0);
-		bSys.Place(2,0,1,0);
+		bSys.Init();  
 		for (int i = 1; i < bSys.blockList.Length; i++) {
 			inventory.Add(i, 0);
 		}
@@ -58,21 +55,24 @@ public class PlayerActions : MonoBehaviour {
 		if (Input.GetKeyDown(gameModeBuild) && gameMode != "Build" || Input.GetKeyDown(gameModeEdit) && gameMode != "Edit" || Input.GetKeyDown(gameModePlay) && gameMode != "Play")
 			Debug.Log(gameMode);
 		#endregion
-		if (Physics.Raycast(cam.position, cam.forward, out rayResult, 15, layer)) {
+		
+		if (Physics.Raycast(cam.position, cam.forward, out rayResult, Mathf.Infinity, layer)) {
 			point = rayResult.point;
 			pointer.transform.position = point;
 			selectedBlock = bSys.SelectedBlockCoord(rayResult);
 			if (gameMode == "Build") {
 				placingTarget = bSys.NewBlockCoord(rayResult);
 				tooClose = IsTooClose(placingTarget, transform.position);
-				if (canBuild && (tooClose || inventory[activeInventoryId] == 0))  {
+				Debug.Log(tooClose);
+				if (canBuild && (tooClose || rayResult.distance > 15 || inventory[activeInventoryId] == 0))  {
 					canBuild = false;
 					pointer.GetComponent<MeshRenderer>().material = pointerNO;
 				}
-				else if (!canBuild && !tooClose && inventory[activeInventoryId] > 0) {
+				else if (!canBuild && !tooClose && rayResult.distance <= 15 && inventory[activeInventoryId] > 0) {
 					canBuild = true;
 					pointer.GetComponent<MeshRenderer>().material = pointerYES;
 				}
+
 				if (Input.GetMouseButtonDown(0) && canBuild) {
 					if(bSys.Place(activeInventoryId, placingTarget) == 0) {
 						inventory[activeInventoryId]--;
@@ -100,6 +100,6 @@ public class PlayerActions : MonoBehaviour {
 			foreach (var y in arry)
 				foreach (var z in arrz)
 					occupiedBlocks.Add(new Vector3Int(x, y, z));
-		return occupiedBlocks.IndexOf(block) == -1;
+		return occupiedBlocks.IndexOf(block) != -1;
 	}
 }
