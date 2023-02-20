@@ -3,28 +3,34 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class BlockSystem : MonoBehaviour {
-	static Vector3Int maxDim = new Vector3Int(30, 10, 30);
-	bool[,] unlockedChunks = new bool[3, 3] {{false, false, false},{false, true, false},{false, false, false}}; //change to maxDim
+	static Vector3Int mapDim = new Vector3Int(30, 10, 30);
+	bool[,] unlockedChunks = new bool[3, 3] {
+		// +----> NORTH
+		/* | */	{false, false, false},
+		/* | */	{false, true, false},
+		/* v */	{false, false, false}
+	};
 	[SerializeField]
 	//? array to store every type of block in the game
 		public BlockType[] blockList;
 	//? matrix to store the index of every handler in the dictionary
-		int[,,] map = new int[maxDim.x, maxDim.y, maxDim.z];
+		int[,,] map = new int[mapDim.x, mapDim.y, mapDim.z];
 	//? dictionary to store an handler for every single block placed (air is 0)
 		Dictionary<int, BlockHandler> handlers = new Dictionary<int, BlockHandler>();
 		int dictCounter = 1;
 
-		public GameObject tile;
+		public BordersGenerator bGen;
 
-	public void Init() {
+	void Start() {
 		handlers[0] = new BlockHandler(blockList[0], new Vector3Int(0,0,0));
-		for (int x = 0; x < maxDim.x; x++) {
-			for (int y = 0; y < maxDim.y; y++) {
-				for (int z = 0; z < maxDim.z; z++) {
+		for (int x = 0; x < mapDim.x; x++) {
+			for (int y = 0; y < mapDim.y; y++) {
+				for (int z = 0; z < mapDim.z; z++) {
 					map[x,y,z] = 0;
 				}
 			}
 		}
+		bGen.GenerateChunks(mapDim, unlockedChunks);
 	}
 
 	#region Place
@@ -92,7 +98,6 @@ public class BlockSystem : MonoBehaviour {
 		Vector3Int coord = new Vector3Int(Mathf.FloorToInt(pos.x), Mathf.FloorToInt(pos.y), Mathf.FloorToInt(pos.z));
 		return coord;
 	}
-
 	#region useful mini functions
 		void MapUpdate(int handlerId, Vector3Int coord) {
 			map[coord.x, coord.y, coord.z] = handlerId;
@@ -111,7 +116,10 @@ public class BlockSystem : MonoBehaviour {
 			return Array.IndexOf(blockList, handlers[map[coord.x, coord.y, coord.z]].type);
 		}
 		public bool OutOfBorders(Vector3Int coord) {
-			return coord.x < 0 || coord.y < 0 || coord.z< 0 || coord.x >= maxDim.x || coord.y >= maxDim.y || coord.z>= maxDim.z;
+			return coord.x < 0 || coord.y < 0 || coord.z< 0 || coord.x >= mapDim.x || coord.y >= mapDim.y || coord.z>= mapDim.z;
+		}
+		public void unlockChunk() {
+			bGen.GenerateChunks(mapDim, unlockedChunks);
 		}
 	#endregion
 }

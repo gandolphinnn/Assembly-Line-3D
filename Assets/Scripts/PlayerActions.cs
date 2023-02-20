@@ -9,34 +9,32 @@ public class PlayerActions : MonoBehaviour {
 
 	#region raycast
 		[Header("RayCast")]
-			[SerializeField] private Transform cam;
-			[SerializeField] private GameObject pointer;
-			[SerializeField] private Material pointerYES;
-			[SerializeField] private Material pointerNO;
-			[SerializeField] private LayerMask layer;
-		private RaycastHit rayResult;
-		private Vector3 point;
-		private bool tooClose;
+			[SerializeField] Transform cam;
+			[SerializeField] GameObject pointer;
+			[SerializeField] Material pointerYES;
+			[SerializeField] Material pointerNO;
+			[SerializeField] LayerMask layer;
+		RaycastHit rayResult;
+		bool tooClose;
 	#endregion
 
 	#region block system
 		public GameObject blockManager;
-		private BlockSystem bSys;
+		BlockSystem bSys;
 	#endregion
 
 	#region player data
-		private string gameMode = "Build";
-		private int activeInventoryId = 1;
-		private Vector3Int selectedBlock;
-		private Vector3Int placingTarget;
-		private bool canBuild = false;
+		string gameMode = "Build";
+		int activeInventoryId = 1;
+		Vector3Int selectedBlock;
+		Vector3Int placingTarget;
+		bool canBuild = false;
 		//? inventory[blockId] = quantity of that block in inventory
-		private Dictionary<int, int> inventory = new Dictionary<int, int>();
+		Dictionary<int, int> inventory = new Dictionary<int, int>();
 	#endregion
 
 	void Start() {
 		bSys = blockManager.GetComponent<BlockSystem>();
-		bSys.Init();  
 		for (int i = 1; i < bSys.blockList.Length; i++) {
 			inventory.Add(i, 0);
 		}
@@ -57,13 +55,12 @@ public class PlayerActions : MonoBehaviour {
 		#endregion
 		
 		if (Physics.Raycast(cam.position, cam.forward, out rayResult, Mathf.Infinity, layer)) {
-			point = rayResult.point;
-			pointer.transform.position = point;
+			pointer.transform.position = rayResult.point;
+			pointer.GetComponent<MeshRenderer>().enabled = true;
 			selectedBlock = bSys.SelectedBlockCoord(rayResult);
 			if (gameMode == "Build") {
 				placingTarget = bSys.NewBlockCoord(rayResult);
 				tooClose = IsTooClose(placingTarget, transform.position);
-				Debug.Log(tooClose);
 				if (canBuild && (tooClose || rayResult.distance > 15 || inventory[activeInventoryId] == 0))  {
 					canBuild = false;
 					pointer.GetComponent<MeshRenderer>().material = pointerNO;
@@ -89,6 +86,10 @@ public class PlayerActions : MonoBehaviour {
 			/* if (gameMode == "Edit") {
 				
 			} */
+		}
+		else {
+			pointer.transform.position = new Vector3(-1, -1, -1);
+			pointer.GetComponent<MeshRenderer>().enabled = false;
 		}
 	}
 	bool IsTooClose(Vector3Int block, Vector3 coord) {
