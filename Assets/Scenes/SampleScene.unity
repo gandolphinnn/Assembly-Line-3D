@@ -181,7 +181,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ca1d5652280774345a0b1508d49189ad, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  borderMaterial: {fileID: 2100000, guid: f2ec133beb63059449328ae7f507acb4, type: 2}
+  borderMaterial: {fileID: 2100000, guid: dd9ccce16e1e4ab4893b33b72995e044, type: 2}
+  terrainMaterial: {fileID: 2100000, guid: 36162441af2926b4887ef31f0bddfbd2, type: 2}
 --- !u!33 &161782603
 MeshFilter:
   m_ObjectHideFlags: 0
