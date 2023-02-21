@@ -1,17 +1,13 @@
+using System;
+using System.Collections.Generic;
 using UnityEngine;
 
-[RequireComponent(typeof(MeshFilter))]
-public class BordersGenerator: MonoBehaviour
-{
+public class BordersGenerator: MonoBehaviour {
 	[SerializeField] Material borderMaterial;
-
-	Mesh mesh;
-	Vector3[] vertices;
-	int[] triangles;
+	[SerializeField] Material terrainMaterial;
 
 	public void GenerateChunks(Vector3Int mapDim, bool[,] unlockedChunks) {
-		Debug.Log(unlockedChunks.GetLength(0));
-		Vector3Int chunkDim = new Vector3Int(mapDim.x/3, mapDim.y, mapDim.z/3);
+		Vector3Int chunkDim = new Vector3Int(mapDim.x/unlockedChunks.GetLength(0), mapDim.y, mapDim.z/unlockedChunks.GetLength(1));
 		for (int xChunk = 0; xChunk < unlockedChunks.GetLength(0); xChunk++) {
 			for (int zChunk = 0; zChunk < unlockedChunks.GetLength(1); zChunk++) {
 				if (unlockedChunks[xChunk, zChunk]) {
@@ -23,7 +19,7 @@ public class BordersGenerator: MonoBehaviour
 						for (int x = xChunk*chunkDim.x; x < (xChunk + 1)*chunkDim.x; x++) {
 							for (int z = zChunk*chunkDim.z; z < (zChunk + 1)*chunkDim.z; z++) {
 								createTile(ceiling, new Vector3(x+.5f, chunkDim.y, z+.5f), new Vector3(180, 0, 0), $"Ceiling Tile({x},{chunkDim.y},{z})").GetComponent<MeshRenderer>().enabled = false;
-								createTile(floor, new Vector3(x+.5f, 0, z+.5f), new Vector3(), $"Floor Tile({x},0,{z})");
+								createTile(floor, new Vector3(x+.5f, 0, z+.5f), new Vector3(), $"Floor Tile({x},0,{z})").GetComponent<MeshRenderer>().material = terrainMaterial;
 							}
 						}
 					#endregion
@@ -68,47 +64,30 @@ public class BordersGenerator: MonoBehaviour
 		}
 	}
 	GameObject createTile(GameObject parent, Vector3 coord, Vector3 rotation, string name) {
+		#region mesh definition
+			Mesh mesh = new Mesh();
+			Vector3[] vertices = new Vector3[] {
+				new Vector3(-.5f, 0, -.5f),
+				new Vector3(-.5f, 0, .5f),
+				new Vector3(.5f, 0, -.5f),
+				new Vector3(.5f, 0, .5f),
+			};
+			mesh.vertices = vertices;
+			int[] triangles = new int[] {
+				0, 1, 2,
+				1, 3, 2
+			};
+			mesh.triangles = triangles;
+		#endregion
 		GameObject tile = NewEmpty(parent, name);
 		tile.layer = LayerMask.NameToLayer("Map Borders");
-		mesh = new Mesh();
 		tile.transform.position = coord;
 		tile.AddComponent<MeshFilter>();
 		tile.AddComponent<MeshRenderer>();
 		tile.AddComponent<MeshCollider>();
 		tile.GetComponent<MeshFilter>().mesh = mesh;
 		tile.GetComponent<MeshRenderer>().material = borderMaterial;
-		vertices = new Vector3[]
-		{
-			new Vector3(-.5f, 0, -.5f),
-			new Vector3(-.5f, 0, .5f),
-			new Vector3(.5f, 0, -.5f),
-			new Vector3(.5f, 0, .5f),
-
-		};
-		mesh.vertices = vertices;
-		triangles = new int[]
-		{
-			0, 1, 2,
-			1, 3, 2
-		};
-		mesh.triangles = triangles;
-		Vector3[] normals = new Vector3[]
-		{
-			-Vector3.forward,
-			-Vector3.forward,
-			-Vector3.forward,
-			-Vector3.forward
-		};
-		mesh.normals = normals;
-		Vector2[] uv = new Vector2[4]
-		{
-			new Vector2(0, 0),
-			new Vector2(1, 0),
-			new Vector2(0, 1),
-			new Vector2(1, 1)
-		};
-		mesh.uv = uv;
-
+		tile.GetComponent<MeshRenderer>().enabled = true;
 		tile.GetComponent<MeshCollider>().sharedMesh = mesh;
 		tile.transform.Rotate(rotation);
 		return tile;

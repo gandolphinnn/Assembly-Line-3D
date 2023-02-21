@@ -234,20 +234,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 129bb9fffb9191d45bc554b2306c5219, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  blockList:
+  bGen: {fileID: 161782602}
+  everyBlockList:
   - name: Air
-    material: {fileID: 0}
     prefab: {fileID: 0}
   - name: Buyer
-    material: {fileID: 2100000, guid: c8ebeeddb9bcced4294314ccde8ebee5, type: 2}
-    prefab: {fileID: 1539219434381481196, guid: 6a28a88c11eb64d4dba2a75bf7b8e197, type: 3}
+    prefab: {fileID: 1539219434381481196, guid: 81adccc01467f9246af5adbf1b383f3b, type: 3}
   - name: Conveyor Belt
-    material: {fileID: 2100000, guid: a5e60ec769d195743b9a335f7f823ffc, type: 2}
-    prefab: {fileID: 1539219434381481196, guid: 6a28a88c11eb64d4dba2a75bf7b8e197, type: 3}
+    prefab: {fileID: 1539219434381481196, guid: e8cc6145756267d408dd1e94aa4c6c56, type: 3}
   - name: Seller
-    material: {fileID: 2100000, guid: 2dd365df77420644480d018cdfc9ab47, type: 2}
-    prefab: {fileID: 1539219434381481196, guid: 6a28a88c11eb64d4dba2a75bf7b8e197, type: 3}
-  bGen: {fileID: 161782602}
+    prefab: {fileID: 1539219434381481196, guid: d8ed7e80b1fb3244f9a88fae944f8229, type: 3}
 --- !u!1 &295276861
 GameObject:
   m_ObjectHideFlags: 0
@@ -366,17 +362,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e99fa1f909ac69545b3edec5ad299264, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gameModeBuild: 49
-  gameModeEdit: 50
-  gameModePlay: 51
+  gameModeSwapKey: 308
+  gameModePlayKey: 112
   cam: {fileID: 963194228}
   pointer: {fileID: 1333642248645081, guid: fed0ba1a1a9927f439291f9572b5f774, type: 3}
   pointerYES: {fileID: 2100000, guid: fff6abb03b3433842ab453dadaddd4a4, type: 2}
   pointerNO: {fileID: 2100000, guid: 5feeaa88e0e543c49b0035028b3445f1, type: 2}
-  layer:
+  rayLayer:
     serializedVersion: 2
     m_Bits: 768
-  blockManager: {fileID: 226716744}
+  bSys: {fileID: 226716746}
 --- !u!1 &472863060
 GameObject:
   m_ObjectHideFlags: 0

@@ -1,11 +1,15 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class PlayerActions : MonoBehaviour {
-	[Header("Keys")]
-		public KeyCode gameModeBuild = KeyCode.Alpha1;
-		public KeyCode gameModeEdit = KeyCode.Alpha2;
-		public KeyCode gameModePlay = KeyCode.Alpha3;
+	#region game mode
+		[Header("Keys")]
+			[SerializeField] KeyCode gameModeSwapKey = KeyCode.LeftAlt;
+			[SerializeField] KeyCode gameModePlayKey = KeyCode.P;
+		string gameMode = "Build";
+		bool gameModePlay = false;
+	#endregion
 
 	#region raycast
 		[Header("RayCast")]
@@ -13,85 +17,82 @@ public class PlayerActions : MonoBehaviour {
 			[SerializeField] GameObject pointer;
 			[SerializeField] Material pointerYES;
 			[SerializeField] Material pointerNO;
-			[SerializeField] LayerMask layer;
+			[SerializeField] LayerMask rayLayer;
 		RaycastHit rayResult;
 		bool tooClose;
 	#endregion
 
-	#region block system
-		public GameObject blockManager;
-		BlockSystem bSys;
+	#region player data
+		Vector3Int selectedCoord;
+		Vector3Int placingCoord;
+		bool canBuild = false;
+		Dictionary<int, int> inventory = new Dictionary<int, int>(); //? inventory[blockId] = quantity of that block in inventory
+		int activeInventoryId = 1;
 	#endregion
 
-	#region player data
-		string gameMode = "Build";
-		int activeInventoryId = 1;
-		Vector3Int selectedBlock;
-		Vector3Int placingTarget;
-		bool canBuild = false;
-		//? inventory[blockId] = quantity of that block in inventory
-		Dictionary<int, int> inventory = new Dictionary<int, int>();
-	#endregion
+	[SerializeField] BlockSystem bSys;
 
 	void Start() {
-		bSys = blockManager.GetComponent<BlockSystem>();
-		for (int i = 1; i < bSys.blockList.Length; i++) {
+		for (int i = 1; i < bSys.everyBlockList.Length; i++) {
 			inventory.Add(i, 0);
 		}
+		pointer = Instantiate(pointer);
+		//? testing
 		inventory[1] = 10;
 		inventory[2] = 5;
-		pointer = Instantiate(pointer);
 	}
 	void Update() {
 		#region change gameMode
-		if (Input.GetKeyDown(gameModeBuild) && gameMode != "Build")
-			gameMode = "Build";
-		if (Input.GetKeyDown(gameModeEdit) && gameMode != "Edit")
-			gameMode = "Edit";
-		if (Input.GetKeyDown(gameModePlay) && gameMode != "Play")
-			gameMode = "Play";
-		if (Input.GetKeyDown(gameModeBuild) && gameMode != "Build" || Input.GetKeyDown(gameModeEdit) && gameMode != "Edit" || Input.GetKeyDown(gameModePlay) && gameMode != "Play")
-			Debug.Log(gameMode);
+			if (Input.GetKeyDown(gameModeSwapKey) && gameMode != "Build")
+				gameMode = "Build";
+			if (Input.GetKeyDown(gameModeSwapKey) && gameMode != "Edit")
+				gameMode = "Edit";
+			if (Input.GetKeyDown(gameModePlayKey))
+				gameModePlay = !gameModePlay;
 		#endregion
 		
-		if (Physics.Raycast(cam.position, cam.forward, out rayResult, Mathf.Infinity, layer)) {
+		if (Physics.Raycast(cam.position, cam.forward, out rayResult, Mathf.Infinity, rayLayer)) {
 			pointer.transform.position = rayResult.point;
-			pointer.GetComponent<MeshRenderer>().enabled = true;
-			selectedBlock = bSys.SelectedBlockCoord(rayResult);
+			Debug.Log(rayResult.triangleIndex);
+			selectedCoord = bSys.GetSelectedCoord(rayResult);
 			if (gameMode == "Build") {
-				placingTarget = bSys.NewBlockCoord(rayResult);
-				tooClose = IsTooClose(placingTarget, transform.position);
-				if (canBuild && (tooClose || rayResult.distance > 15 || inventory[activeInventoryId] == 0))  {
-					canBuild = false;
-					pointer.GetComponent<MeshRenderer>().material = pointerNO;
-				}
-				else if (!canBuild && !tooClose && rayResult.distance <= 15 && inventory[activeInventoryId] > 0) {
-					canBuild = true;
-					pointer.GetComponent<MeshRenderer>().material = pointerYES;
-				}
+				placingCoord = bSys.GetPlacingCoord(rayResult);
+				#region can build
+					tooClose = IsTooClose(placingCoord, transform.position);
+					if (canBuild && (tooClose || rayResult.distance > 15 || inventory[activeInventoryId] == 0))  {
+						canBuild = false;
+						pointer.GetComponent<MeshRenderer>().material = pointerNO;
+					}
+					else if (!canBuild && !tooClose && rayResult.distance <= 15 && inventory[activeInventoryId] > 0) {
+						canBuild = true;
+						pointer.GetComponent<MeshRenderer>().material = pointerYES;
+					}
+				#endregion
 
-				if (Input.GetMouseButtonDown(0) && canBuild) {
-					if(bSys.Place(activeInventoryId, placingTarget) == 0) {
+				if (Input.GetMouseButtonDown(1) && canBuild) {
+					if(bSys.Place(activeInventoryId, placingCoord) == 0) {
 						inventory[activeInventoryId]--;
-						Debug.Log(inventory);
 					}
 				}
-				if (Input.GetMouseButtonDown(1) && !bSys.OutOfBorders(selectedBlock)) {
-					int breakedTypeIndex = bSys.GetBlockType(selectedBlock);
-					if( bSys.Break(selectedBlock) > 0) {
+				if (Input.GetMouseButtonDown(0) && !bSys.OutOfBorders(selectedCoord)) {
+					int breakedTypeIndex = bSys.GetBlockType(selectedCoord);
+					if( bSys.Break(selectedCoord) > 0) {
 						inventory[breakedTypeIndex]++;
 					}
 				}
 			}
-			/* if (gameMode == "Edit") {
-				
-			} */
+			if (gameMode == "Edit") {
+				bSys.Edit(selectedCoord);
+			}
+			if (gameModePlay) {
+				bSys.Play();
+			}
 		}
 		else {
 			pointer.transform.position = new Vector3(-1, -1, -1);
-			pointer.GetComponent<MeshRenderer>().enabled = false;
 		}
 	}
+
 	bool IsTooClose(Vector3Int block, Vector3 coord) {
 		List<Vector3Int> occupiedBlocks = new List<Vector3Int>();
 		int[] arrx = {Mathf.FloorToInt(coord.x - .45f), Mathf.FloorToInt(coord.x + .45f)};
