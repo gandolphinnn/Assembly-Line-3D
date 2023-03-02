@@ -5,12 +5,22 @@ using UnityEngine;
 public class BordersGenerator: MonoBehaviour {
 	[SerializeField] Material borderMaterial;
 	[SerializeField] Material terrainMaterial;
-
-	public void GenerateChunks(Vector3Int mapDim, bool[,] unlockedChunks) {
-		Vector3Int chunkDim = new Vector3Int(mapDim.x/unlockedChunks.GetLength(0), mapDim.y, mapDim.z/unlockedChunks.GetLength(1));
-		for (int xChunk = 0; xChunk < unlockedChunks.GetLength(0); xChunk++) {
-			for (int zChunk = 0; zChunk < unlockedChunks.GetLength(1); zChunk++) {
-				if (unlockedChunks[xChunk, zChunk]) {
+	bool[,] chunks;
+	Vector3Int chunkDim;
+	public void Init(Vector3Int mapDim, bool[,] unlockedChunks) {
+		chunkDim = new Vector3Int(mapDim.x/unlockedChunks.GetLength(0), mapDim.y, mapDim.z/unlockedChunks.GetLength(1));
+		GenerateChunks(unlockedChunks);
+	}
+	public bool GenerateChunks(bool[,] unlockedChunks) {
+		if (chunks == unlockedChunks)
+			return false;
+		chunks = unlockedChunks;
+		foreach (Transform child in transform) {
+			GameObject.Destroy(child.gameObject);
+		}
+		for (int xChunk = 0; xChunk < chunks.GetLength(0); xChunk++) {
+			for (int zChunk = 0; zChunk < chunks.GetLength(1); zChunk++) {
+				if (chunks[xChunk, zChunk]) {
 					GameObject chunk = NewEmpty(gameObject, $"Chunk({xChunk},{zChunk})");
 					GameObject ceiling = NewEmpty(chunk, "Ceiling");
 					GameObject floor = NewEmpty(chunk, "Floor");
@@ -24,7 +34,7 @@ public class BordersGenerator: MonoBehaviour {
 						}
 					#endregion
 					#region walls
-						if (zChunk == unlockedChunks.GetLength(1) - 1 || !unlockedChunks[xChunk, zChunk+1]) {
+						if (zChunk == chunks.GetLength(1) - 1 || !chunks[xChunk, zChunk+1]) {
 							GameObject wall = NewEmpty(walls, "North Wall");
 							for (int y = 0; y < chunkDim.y; y++) {
 								for (int x = xChunk*chunkDim.x; x < (xChunk + 1)*chunkDim.x; x++) {
@@ -32,7 +42,7 @@ public class BordersGenerator: MonoBehaviour {
 								}
 							}
 						}
-						if (zChunk == 0 || !unlockedChunks[xChunk, zChunk-1]) {
+						if (zChunk == 0 || !chunks[xChunk, zChunk-1]) {
 							GameObject wall = NewEmpty(walls, "South Wall");
 							for (int y = 0; y < chunkDim.y; y++) {
 								for (int x = xChunk*chunkDim.x; x < (xChunk + 1)*chunkDim.x; x++) {
@@ -40,7 +50,7 @@ public class BordersGenerator: MonoBehaviour {
 								}
 							}
 						}
-						if (xChunk == unlockedChunks.GetLength(0) - 1 || !unlockedChunks[xChunk+1, zChunk]) {
+						if (xChunk == chunks.GetLength(0) - 1 || !chunks[xChunk+1, zChunk]) {
 							GameObject wall = NewEmpty(walls, "East Wall");
 							for (int y = 0; y < chunkDim.y; y++) {
 								for (int z = zChunk*chunkDim.z; z < (zChunk + 1)*chunkDim.z; z++) {
@@ -48,7 +58,7 @@ public class BordersGenerator: MonoBehaviour {
 								}
 							}
 						}
-						if (xChunk == 0 || !unlockedChunks[xChunk-1, zChunk]) {
+						if (xChunk == 0 || !chunks[xChunk-1, zChunk]) {
 							GameObject wall = NewEmpty(walls, "West Wall");
 							for (int y = 0; y < chunkDim.y; y++) {
 								for (int z = zChunk*chunkDim.z; z < (zChunk + 1)*chunkDim.z; z++) {
@@ -62,6 +72,7 @@ public class BordersGenerator: MonoBehaviour {
 				}
 			}
 		}
+		return true;
 	}
 	GameObject createTile(GameObject parent, Vector3 coord, Vector3 rotation, string name) {
 		#region mesh definition
