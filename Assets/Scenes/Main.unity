@@ -396,23 +396,17 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   bGen: {fileID: 161782602}
-  hitBoxPrefab: {fileID: 5823132961221434224, guid: 7ebd4c747e57d3a498a78afc2841a7ee, type: 3}
   everyBlockList:
   - name: Air
     prefab: {fileID: 0}
-    dimension: {x: 0, y: 0, z: 0}
   - name: Buyer
     prefab: {fileID: 1402201374050023002, guid: 81adccc01467f9246af5adbf1b383f3b, type: 3}
-    dimension: {x: 0.95, y: 1, z: 0.95}
   - name: Seller
     prefab: {fileID: 1539219434381481196, guid: d8ed7e80b1fb3244f9a88fae944f8229, type: 3}
-    dimension: {x: 0, y: 0, z: 0}
   - name: Conveyor Belt
     prefab: {fileID: 3630419585800283359, guid: 40b25c0564b2dfe4a9fa4241a176450d, type: 3}
-    dimension: {x: 0, y: 0, z: 0}
   - name: Press
     prefab: {fileID: 1539219434381481196, guid: 23f94c50c1f04e84699492c5eb8edcb0, type: 3}
-    dimension: {x: 0, y: 0, z: 0}
 --- !u!1 &295239013
 GameObject:
   m_ObjectHideFlags: 0
@@ -610,7 +604,6 @@ MonoBehaviour:
   rayLayer:
     serializedVersion: 2
     m_Bits: 896
-  pointer: {fileID: 6260519267660422360, guid: 0f1a683d4f6e75a4c8388561b640f588, type: 3}
   bSys: {fileID: 226716746}
   cMan: {fileID: 1163139697}
 --- !u!4 &334033996 stripped
