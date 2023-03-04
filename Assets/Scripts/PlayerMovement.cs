@@ -1,20 +1,20 @@
 using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour {
-	[Header("Movement")]
-		[SerializeField] float moveSpeed;
-		[SerializeField] float groundDrag;
-		[SerializeField, Range(1, 15f)] public int jumpForce = 8;
-		[SerializeField, Range(.1f, 1f)] public float airMovementMultiplier = .5f;
-
 	[Header("KeyBinds")]
 		public KeyCode jumpKey = KeyCode.Space;
 		public KeyCode crouchKey = KeyCode.LeftShift;
 	
+	const float crouchRatio = .75f;
+	const float moveSpeed = 7;
+	const float groundDrag = 5;
+	const float airMovementMultiplier = .5f;
+	
 	Rigidbody rb;
 	Transform orientation;
 	Vector3[] dimensions;
-	float crouchRatio = .75f;
+	int[] jumpForces = new int[] {6, 10};
+	int jForce;
 	float groudnDist;
 	
 	void Start () {
@@ -29,17 +29,19 @@ public class PlayerMovement : MonoBehaviour {
 			if (Input.GetKey(crouchKey)) {
 				transform.localScale = dimensions[1];
 				groudnDist = dimensions[1].y+.1f;
+				jForce = jumpForces[1];
 			}
 			else if (!Input.GetKey(crouchKey)) {
 				transform.localScale = dimensions[0];
 				groudnDist = dimensions[0].y+.1f;
+				jForce = jumpForces[0];
 			}
 		#endregion
 
 		#region jump controller
 			if (Input.GetKey(jumpKey) && Physics.Raycast(transform.position, Vector3.down, groudnDist)) {
 				rb.velocity = new Vector3(rb.velocity.x, 0f, rb.velocity.z);
-				rb.AddForce(transform.up * jumpForce, ForceMode.Impulse);
+				rb.AddForce(transform.up * jForce, ForceMode.Impulse);
 			}
 		#endregion
 
