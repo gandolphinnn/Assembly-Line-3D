@@ -762,6 +762,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   activeBlockUpKey: 101
   activeBlockDownKey: 113
+  cbMaxObjs: 5
   activeBlock: 1
 --- !u!114 &314758582
 MonoBehaviour:
@@ -3854,7 +3855,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 153e072a4e7312840bdb1ef5d68c1cf2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  everyMaterialList:
+  materialList:
   - name: Aluminum
     mat: {fileID: 2100000, guid: 6f7619bd54ee0954db90268fc41b7048, type: 2}
   - name: Copper
@@ -3867,7 +3868,7 @@ MonoBehaviour:
     mat: {fileID: 2100000, guid: be27993a1ff2b2d44b2574cfee2d52f8, type: 2}
   - name: Silicon
     mat: {fileID: 2100000, guid: 9575bccf99ae0604bb2ddda195dd46fd, type: 2}
-  everyItemList:
+  itemList:
   - name: Lump
     prefab: {fileID: 919132149155446097, guid: aaf008cdfb2792f4bab3d812760410d5, type: 3}
     icon: {fileID: 0}
