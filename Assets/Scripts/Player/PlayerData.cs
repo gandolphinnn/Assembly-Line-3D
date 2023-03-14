@@ -14,6 +14,10 @@ public class PlayerData : MonoBehaviour {
 		BlockSystem bSys;
 	#endregion
 
+	#region player data
+		public int cbMaxObjs = 5;
+	#endregion
+
 	[HideInInspector] public int activeBlock = 1;
 	public Dictionary<int, int> inventory = new Dictionary<int, int>(); //? inventory[blockId] = quantity of that block in inventory
 
