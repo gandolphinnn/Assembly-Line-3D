@@ -14,6 +14,7 @@ public class Seller : CBlock {
 			Debug.Log($"{obj.name} sold");
 			Destroy(obj);
 		}
+		activeObjs.Clear();
 	}
 	public override void Edit() {
 	}
